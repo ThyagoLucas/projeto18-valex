@@ -1,8 +1,12 @@
 import express,{ Request, Response, json} from "express";
 import cors from 'cors';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 
 const server = express();
+const port: number = +process.env.PORT || 4000; 
 
 server.use(cors());
 server.use(json());
@@ -15,7 +19,7 @@ server.get('/', (req: Request, res: Response) => {
 });
 
 
-server.listen(4000, ()=>{console.log("server is running on port 4000")});
+server.listen(port, ()=>{console.log("server is running on port 4000")});
 
 
 
