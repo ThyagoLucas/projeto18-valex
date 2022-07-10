@@ -1,9 +1,11 @@
 import { Request, Response } from "express";
+import insertCard from "../services/createCardService.js";
 
 export async function createCreditCard(req: Request, res: Response){
 
-    console.log('im here in create CC');
+    const { employeeCod, type } = req.body;
 
+    insertCard(employeeCod, type);
+    
     res.sendStatus(201);
-
 }
