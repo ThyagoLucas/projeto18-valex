@@ -1,4 +1,5 @@
 
+import dayjs from "dayjs";
 import { NextFunction, Request, Response, } from "express";
 import { findByTypeAndEmployeeId, findById as findCardById} from "../repositories/cardRepository.js";
 import { findByApiKey } from "../repositories/companyRepository.js";
@@ -43,4 +44,38 @@ export async function verifyReqToRegisterPassword(req: Request, res: Response, n
     if( passLength.length != 4) throw {type: "500", messege:"invalid password length"};
 
     next();
+}
+
+export async function verifyDatasReqToRecharges(req: Request, res: Response, next: NextFunction){
+
+    const { cardId, amount } = req.body;
+    const  token  = req.headers['x-api-key'] as string;
+
+    // check amount and cardId type
+    if(typeof(amount) != 'number') throw {type: 500, message: "invalid amount type"};
+    if(amount <= 0) throw {type: 500, message: "invalid amount value"};
+    if(typeof(cardId) != 'number') throw {type: 500, message: "invalid code card type"};
+
+    // check isCard registred
+    const userCard = await findCardById(cardId);
+    
+    if( !userCard ) throw {type: 500, message: "invalid code Card"};
+    if( userCard.isBlocked ) throw {type: 500, message: "card is blocked, unlocked it"};
+
+    // check validate card
+    const validate = userCard.expirationDate.split('/');
+    const monthValidate = Number (validate[0]);
+    const yearValidate = Number (validate[1]);
+    const month = Number (dayjs().format('MM'));
+    const year = Number (dayjs().format('YY'));
+
+    if( yearValidate <= year && monthValidate < month  ) throw {type: "500", messege:"Expired card"};
+
+    // checking if userCard is company employee
+    const company = await findByApiKey(token);
+    const employee = await findById(userCard.employeeId);
+    if(!employee || !company || employee.companyId != company.id) throw {type: 500, message: "unauthorized"};
+
+    next();
+
 }

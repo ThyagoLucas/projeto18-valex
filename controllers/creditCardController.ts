@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { activeCard } from "../services/activateCardService.js";
 import insertCard from "../services/createCardService.js";
+import { recharge } from "../services/creditCardServices.js";
 
 export async function createCreditCard(req: Request, res: Response){
 
@@ -20,4 +21,15 @@ export async function activate( req: Request, res: Response ){
     console.log("updated");
 
     res.sendStatus(201)
+}
+
+export async function recharges(req: Request, res: Response){
+
+    const { cardId, amount } = req.body;
+   
+    await recharge(cardId, amount);
+
+
+    console.log("recharged");
+    res.sendStatus(201);
 }
