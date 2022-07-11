@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 import { Card, insert, TransactionTypes } from "../repositories/cardRepository.js";
 import { faker } from '@faker-js/faker';
 import { findById } from "../repositories/employeeRepository.js";
-import Cryptr from 'cryptr';
+import cryptr from "../cryptrConfig.js";
 
 export default async function insertCard(userId: number, type: string){
 
@@ -24,8 +24,8 @@ export default async function insertCard(userId: number, type: string){
    
     //generating CVC
     const cvc = faker.finance.creditCardCVV();
-    const cryptr = new Cryptr(cvc);
-    const emcryptedcvc = cryptr.encrypt(cvc);
+    // encrypting
+    const emcryptedcvc = cryptr.encrypt(`${cvc}`);
 
     console.log(cvc) //delete if you dont want see the cvc in console
     card.employeeId = userId;

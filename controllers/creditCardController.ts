@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { activeCard } from "../services/activateCardService.js";
 import insertCard from "../services/createCardService.js";
 
 export async function createCreditCard(req: Request, res: Response){
@@ -11,8 +12,12 @@ export async function createCreditCard(req: Request, res: Response){
 }
 
 export async function activate( req: Request, res: Response ){
+
+    const { cardId, cvc, password }= req.body;
     
-    console.log('funfei aqui');
+    await activeCard( cardId, cvc, password );
+
+    console.log("updated");
 
     res.sendStatus(201)
 }

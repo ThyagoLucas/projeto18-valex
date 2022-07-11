@@ -7,7 +7,4 @@ const routers = Router();
 routers.use(creditCard);
 routers.use(activateCard);
 
-
-
-
 export default routers;
