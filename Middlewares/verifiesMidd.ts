@@ -29,3 +29,15 @@ export async function verifyRequestDatas(req: Request, res: Response, next: Next
     next();
 }
 
+export async function verifyReqToRegisterPassword(req: Request, res: Response, next: NextFunction){
+
+    const { userId, cvc, password }= req.body;
+    const passLength = password.toString();
+
+    if( typeof(userId) != 'number') throw {type: "500", messege:"code client invalid"};
+    if( typeof(cvc) != 'number' ) throw {type: "500", messege:"code cvc is invalid"};
+    if( typeof(password) != 'number' ) throw {type: "500", messege:"invalid password type"};
+    if( passLength.length != 4) throw {type: "500", messege:"invalid password length"};
+
+    next();
+}

@@ -9,3 +9,10 @@ export async function createCreditCard(req: Request, res: Response){
     
     res.sendStatus(201);
 }
+
+export async function activate( req: Request, res: Response ){
+    
+    console.log('funfei aqui');
+
+    res.sendStatus(201)
+}
