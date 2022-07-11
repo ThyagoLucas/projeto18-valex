@@ -8,6 +8,4 @@ const creditCard = Router();
 creditCard.post('/create',verifyRequestDatas, createCreditCard);
 
 
-
-
 export default creditCard;
