@@ -14,16 +14,17 @@ export async function balance (cardId: number){
 
 }
 
-export async function isExpirade (expirationDate: string){
+export function isExpirade (expirationDate: string){
 
+    
      // verify validate
      const validate = expirationDate.split('/');
      const monthValidate = Number (validate[0]);
      const yearValidate = Number (validate[1]);
      const month = Number (dayjs().format('MM'));
      const year = Number (dayjs().format('YY'));
-   
-     if( yearValidate <= year && monthValidate < month  ) throw {type: "500", messege:"Expired card"};
+
+     if( yearValidate <= year && monthValidate < month || yearValidate < year ) throw {type: 401, message:"Expired card"};
  
 
 }

@@ -1,7 +1,7 @@
 import { findByCardId as findRechages, insert, RechargeInsertData } from "../repositories/rechargeRepository.js";
 import dayjs from "dayjs";
 import cryptr from "../cryptrConfig.js";
-import { findById as findCardById, update } from "../repositories/cardRepository.js";
+import { CardUpdateData, findById as findCardById, update } from "../repositories/cardRepository.js";
 import { Card, insert as insertCardDB, TransactionTypes } from "../repositories/cardRepository.js";
 import { faker } from '@faker-js/faker';
 import { findById as findEmployeeById} from "../repositories/employeeRepository.js";
@@ -101,3 +101,47 @@ export async function transactions(cardId: number){
 
 }
 
+export async function blockCard(cardId: number, password: number){
+
+    const userCard = await findCardById(cardId);
+
+    if(!userCard) throw {type: 403, message: "card does not exist "};
+
+    // is valid?
+    isExpirade(userCard.expirationDate);
+
+    // check if is blocked
+    if(userCard.isBlocked) throw {type: 401, message: "card is already blocked"};
+
+    // check password
+    const passwordOnDB = Number (cryptr.decrypt(userCard.password))
+
+    if(password !== passwordOnDB) throw {type: 401, message: "invalid password"};
+
+    const card = {} as CardUpdateData;
+    card.isBlocked = true;
+    await update(cardId, card );
+
+}
+
+export async function unblockedCard(cardId: number, password: number){
+
+    const userCard = await findCardById(cardId);
+
+    if(!userCard) throw {type: 403, message: "card does not exist "};
+
+    // is valid?
+    isExpirade(userCard.expirationDate);
+
+    // check if is unblocked
+    if(!userCard.isBlocked) throw {type: 400, message: "card is already unblocked"};
+
+    // check password
+    const passwordOnDB = Number (cryptr.decrypt(userCard.password));
+    if(password !== passwordOnDB) throw {type: 401, message: "invalid password"};
+
+    const card = {} as CardUpdateData;
+    card.isBlocked = false;
+    await update(cardId, card );
+
+}
