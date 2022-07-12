@@ -5,7 +5,7 @@ export default function errorHandler (error, req: Request, res: Response, next: 
     
     console.log('errosood:', error);
     if(error) {
-        return res.sendStatus(500);
+        return res.status(404).send(error.message);
     }
    
 

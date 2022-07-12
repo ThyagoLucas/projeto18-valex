@@ -25,3 +25,11 @@ export async function insert(rechargeData: RechargeInsertData) {
     [cardId, amount]
   );
 }
+
+export async function allRecharges(cardId:number){
+
+  const result = await connection.query(`SELECT SUM(amount) as "totalRecharges" FROM recharges WHERE "cardId" = $1`, [cardId]);
+  
+  return result.rows[0];
+}
+
