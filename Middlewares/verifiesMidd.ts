@@ -79,3 +79,14 @@ export async function verifyDatasReqToRecharges(req: Request, res: Response, nex
     next();
 
 }
+
+export async function checkAmount(req: Request, res: Response, next: NextFunction){
+
+    const { amount } = req.body;
+
+    if(!amount || typeof(amount) != 'number'|| amount <= 0){
+        throw {type: 404, message: "invalid amount"}
+    }
+
+    next();
+}
