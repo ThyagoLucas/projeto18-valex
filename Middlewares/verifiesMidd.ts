@@ -4,6 +4,7 @@ import { NextFunction, Request, Response, } from "express";
 import { findByTypeAndEmployeeId, findById as findCardById} from "../repositories/cardRepository.js";
 import { findByApiKey } from "../repositories/companyRepository.js";
 import { findById } from "../repositories/employeeRepository.js";
+import { isExpirade } from "../utils/cardUtils.js";
 
 export async function verifyRequestDatas(req: Request, res: Response, next: NextFunction){
 
@@ -25,7 +26,7 @@ export async function verifyRequestDatas(req: Request, res: Response, next: Next
 
     //verify type and employee on some card
     const thereIsCard = await findByTypeAndEmployeeId(type, employeeCod);
-    if(thereIsCard) throw { type: "500", message:"card already exists" }
+    if(thereIsCard) throw { type: 403, message:"card already exists" }
 
     next();
 }
@@ -52,24 +53,18 @@ export async function verifyDatasReqToRecharges(req: Request, res: Response, nex
     const  token  = req.headers['x-api-key'] as string;
 
     // check amount and cardId type
-    if(typeof(amount) != 'number') throw {type: 500, message: "invalid amount type"};
-    if(amount <= 0) throw {type: 500, message: "invalid amount value"};
-    if(typeof(cardId) != 'number') throw {type: 500, message: "invalid code card type"};
+    if(typeof(amount) != 'number') throw {type: 400, message: "invalid amount type"};
+    if(amount <= 0) throw {type: 400, message: "invalid amount value"};
+    if(typeof(cardId) != 'number') throw {type: 400, message: "invalid code card type"};
 
     // check isCard registred
     const userCard = await findCardById(cardId);
     
-    if( !userCard ) throw {type: 500, message: "invalid code Card"};
-    if( userCard.isBlocked ) throw {type: 500, message: "card is blocked, unlocked it"};
+    if( !userCard ) throw {type: 400, message: "invalid code Card"};
+    if( userCard.isBlocked ) throw {type: 401, message: "card is blocked, unlocked it"};
 
     // check validate card
-    const validate = userCard.expirationDate.split('/');
-    const monthValidate = Number (validate[0]);
-    const yearValidate = Number (validate[1]);
-    const month = Number (dayjs().format('MM'));
-    const year = Number (dayjs().format('YY'));
-
-    if( yearValidate <= year && monthValidate < month  ) throw {type: "500", message:"Expired card"};
+    await isExpirade(userCard.expirationDate);
 
     // checking if userCard is company employee
     const company = await findByApiKey(token);
@@ -85,7 +80,7 @@ export async function checkAmount(req: Request, res: Response, next: NextFunctio
     const { amount } = req.body;
 
     if(!amount || typeof(amount) != 'number'|| amount <= 0){
-        throw {type: 404, message: "invalid amount"}
+        throw {type: 401, message: "invalid amount"}
     }
 
     next();

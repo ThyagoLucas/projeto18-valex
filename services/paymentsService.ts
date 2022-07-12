@@ -3,8 +3,7 @@ import { findById as findCardById} from "../repositories/cardRepository.js";
 import cryptr from "../cryptrConfig.js";
 import { findById as findBusinessById} from "../repositories/businessRepository.js";
 import {insert, PaymentInsertData } from "../repositories/paymentRepository.js";
-import { balance } from "../utils/cardUtils.js";
-
+import { balance, isExpirade } from "../utils/cardUtils.js";
 
 export async function payment (cardId: number, password: number, bussinessCod: number, amount: number){
     
@@ -28,13 +27,7 @@ export async function payment (cardId: number, password: number, bussinessCod: n
     if(!bussiness) throw {type: 401, message:"bussiness dont registred"};
 
     // check validate
-    const validate = userCard.expirationDate.split('/');
-    const monthValidate = Number (validate[0]);
-    const yearValidate = Number (validate[1]);
-    const month = Number (dayjs().format('MM'));
-    const year = Number (dayjs().format('YY'));
-
-    if( yearValidate <= year && monthValidate < month  ) throw {type: 401, message:"Expired card"};
+    await isExpirade(userCard.expirationDate);
 
     // check type card and type bussiness
     if(userCard.type != bussiness.type) throw {type: 401, message:"purchase not allowed at this bussiness"};
@@ -47,6 +40,5 @@ export async function payment (cardId: number, password: number, bussinessCod: n
     payment.businessId = bussinessCod;
 
     await insert(payment);
-
 
 }

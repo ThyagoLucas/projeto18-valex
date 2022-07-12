@@ -5,7 +5,7 @@ import { findById as findCardById, update } from "../repositories/cardRepository
 import { Card, insert as insertCardDB, TransactionTypes } from "../repositories/cardRepository.js";
 import { faker } from '@faker-js/faker';
 import { findById as findEmployeeById} from "../repositories/employeeRepository.js";
-import { balance } from "../utils/cardUtils.js";
+import { balance, isExpirade } from "../utils/cardUtils.js";
 import { findByCardId as findPayments } from "../repositories/paymentRepository.js";
 
 
@@ -56,16 +56,10 @@ export async function activeCard( cardId: number, cvc: number, password: number 
     if( !userCard.isBlocked && userCard.password != null) throw {type: "500", messege:"Password already registered"};
 
     // verify validate
-    const validate = userCard.expirationDate.split('/');
-    const monthValidate = Number (validate[0]);
-    const yearValidate = Number (validate[1]);
-    const month = Number (dayjs().format('MM'));
-    const year = Number (dayjs().format('YY'));
-  
-    if( yearValidate <= year && monthValidate < month  ) throw {type: "500", messege:"Expired card"};
+    await isExpirade(userCard.expirationDate);
 
+    // encryp password
     const encryptedPassword = cryptr.encrypt(password);
-
     userCard.password = encryptedPassword;
     userCard.isBlocked = false;
 
