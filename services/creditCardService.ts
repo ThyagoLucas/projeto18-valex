@@ -1,10 +1,12 @@
-import { insert, RechargeInsertData } from "../repositories/rechargeRepository.js";
+import { findByCardId as findRechages, insert, RechargeInsertData } from "../repositories/rechargeRepository.js";
 import dayjs from "dayjs";
 import cryptr from "../cryptrConfig.js";
 import { findById as findCardById, update } from "../repositories/cardRepository.js";
 import { Card, insert as insertCardDB, TransactionTypes } from "../repositories/cardRepository.js";
 import { faker } from '@faker-js/faker';
 import { findById as findEmployeeById} from "../repositories/employeeRepository.js";
+import { balance } from "../utils/cardUtils.js";
+import { findByCardId as findPayments } from "../repositories/paymentRepository.js";
 
 
 export async function insertCard(userId: number, type: string){
@@ -81,3 +83,27 @@ export async function recharge(cardId: number, amount: number){
     await insert(recharge);
 
 }
+
+export async function transactions(cardId: number){
+
+    // check if there is card 
+    if(typeof(cardId) != 'number') throw {type:400, message:"invalid card type"}
+
+    const userCard = await findCardById(cardId);
+
+    if(!userCard) throw {type:404, message:"card does not exist"}
+
+    // generating resume
+    const balanceAvailable = await balance(cardId);
+    const resume = {balance:balanceAvailable, transactions:[], recharges:[] };
+
+    const transactions = await findPayments(cardId);
+    const recharges = await findRechages(cardId);
+
+    resume.transactions = transactions; 
+    resume.recharges = recharges;
+
+    return resume;
+
+}
+

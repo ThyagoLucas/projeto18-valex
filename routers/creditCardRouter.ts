@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { activate, createCreditCard, recharges, transactions } from "../controllers/creditCardController.js";
+import { accountStament, activate, createCreditCard, recharges } from "../controllers/creditCardController.js";
 import { verifyDatasReqToRecharges, verifyReqToRegisterPassword, verifyRequestDatas } from "../Middlewares/verifiesMidd.js";
 
 
@@ -11,6 +11,6 @@ creditCard.patch('/activate', verifyReqToRegisterPassword, activate);
 
 creditCard.post('/recharges', verifyDatasReqToRecharges, recharges);
 
-creditCard.get('/transactions', transactions);
+creditCard.get('/transactions', accountStament);
 
 export default creditCard;
