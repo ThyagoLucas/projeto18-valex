@@ -12,6 +12,9 @@ export async function payment (cardId: number, password: number, bussinessCod: n
     const userCard = await findCardById(cardId);
     if(!userCard) throw {type: "500", message:"card dont exist"};
 
+    // check if card is blocked
+    if(userCard.isBlocked) throw {type: "500", message: "card is blocked"};
+
     // check password
     const decryptedPassword = Number (cryptr.decrypt(userCard.password));
     if(password != decryptedPassword) throw {type: "500", message:"invalid password"};
@@ -28,9 +31,6 @@ export async function payment (cardId: number, password: number, bussinessCod: n
     // verify business
     const bussiness = await findBusinessById(bussinessCod);
     if(!bussiness) throw {type: "500", message:"bussiness dont registred"};
-
-    // check if card is blocked
-    if(userCard.isBlocked) throw {type: "500", message: "card is blocked"};
 
     // check validate
     const validate = userCard.expirationDate.split('/');

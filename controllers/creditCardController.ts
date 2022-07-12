@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
-import { activeCard } from "../services/activateCardService.js";
-import insertCard from "../services/createCardService.js";
-import { recharge } from "../services/creditCardServices.js";
+import { activeCard, insertCard, recharge } from "../services/creditCardService.js";
 
 export async function createCreditCard(req: Request, res: Response){
 
@@ -33,3 +31,10 @@ export async function recharges(req: Request, res: Response){
     console.log("recharged");
     res.sendStatus(201);
 }
+
+export async function transactions(req: Request, res: Response){
+
+
+    res.send("funfou").status(200);
+}
+
